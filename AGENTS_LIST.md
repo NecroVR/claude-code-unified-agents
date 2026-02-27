@@ -79,6 +79,14 @@
 - **healthcare-dev** - HIPAA/FHIR compliance, EHR systems, medical device integration
 - **ecommerce-expert** - Shopping carts, checkout optimization, inventory management
 
+## 🎮 Unreal Engine 5 (6 agents)
+- **ue5-blueprint-architect** - BP/C++ interfaces, data-driven design, Blueprint best practices
+- **ue5-gameplay-programmer** - GAS, Enhanced Input, game framework architecture, subsystems
+- **ue5-multiplayer-engineer** - Replication, RPCs, dedicated servers, EOS, networked movement
+- **ue5-rendering-engineer** - Nanite, Lumen, VSM, World Partition, MegaLights, rendering pipeline
+- **ue5-technical-artist** - Materials, Substrate, Niagara VFX, PCG, shaders, Motion Matching
+- **ue5-tools-engineer** - Slate UI, editor extensions, custom assets, automation testing, UBT
+
 ---
 
 ## Quick Reference by Use Case
@@ -178,6 +186,16 @@
 @agent-performance-coach  # Evaluate and improve agents
 @agent-gap-analyst        # Find capability gaps
 @agent-talent-scout       # Discover external agents
+```
+
+### For Unreal Engine 5
+```
+@ue5-blueprint-architect   # Blueprint architecture
+@ue5-gameplay-programmer   # C++ gameplay, GAS
+@ue5-multiplayer-engineer  # Networking, replication
+@ue5-rendering-engineer    # Nanite, Lumen, rendering
+@ue5-technical-artist      # Materials, VFX, PCG
+@ue5-tools-engineer        # Editor tools, Slate UI
 ```
 
 ## Usage Examples
@@ -280,8 +298,9 @@ cd claude-code-unified-agents
 | Meta-Management | 5 | Automation, optimization, tooling |
 | HR & Agent Management | 3 | Agent quality, gaps, recruitment |
 | Specialized Domains | 5 | Industry-specific expertise |
+| Unreal Engine 5 | 6 | UE5 development specialists |
 
-**Total Agents: 57 specialized agents + 1 orchestrator = 58 total**
+**Total Agents: 63 specialized agents + 1 orchestrator = 64 total**
 
 ## Key Features
 
@@ -294,4 +313,4 @@ cd claude-code-unified-agents
 
 ---
 
-*Last Updated: Latest Version (v2.1) - 57 Production-Ready Agents*
+*Last Updated: Latest Version (v2.1) - 63 Production-Ready Agents*
