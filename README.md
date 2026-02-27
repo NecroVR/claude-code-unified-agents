@@ -1,20 +1,21 @@
-# Claude Code Unified Agents 🤖
+# Claude Code Unified Agents
 
-A comprehensive collection of specialized Claude Code sub-agents combining the best features from multiple community repositories. This unified collection provides 63 production-ready agents across development, infrastructure, quality, AI/ML, business, creative, meta-management, HR & agent management, Unreal Engine 5, and specialized domains.
+A comprehensive collection of specialized Claude Code sub-agents combining the best features from multiple community repositories. This unified collection provides 82 production-ready agents across development, infrastructure, quality, AI/ML, business, creative, marketing, communication, meta-management, HR & agent management, Unreal Engine 5, and specialized domains.
 
-## 🌟 Features
+## Features
 
-- **63 Production-Ready Agents**: Comprehensive coverage across all technical, business, specialized, HR, and UE5 domains
+- **82 Production-Ready Agents**: Comprehensive coverage across 12 categories
 - **Smart Orchestration**: Master orchestrator for complex multi-agent workflows
 - **Category Organization**: Agents organized by expertise domain for easy discovery
-- **Deep Specialization**: Each agent includes 1000+ lines of production-ready code examples
+- **Deep Specialization**: Each agent includes production-ready code examples and implementation patterns
 - **Flexible Tool Access**: Configurable tool permissions per agent
 - **Best Practices**: Each agent follows industry best practices and patterns
+- **Self-Improving**: HR agents audit, evaluate, and improve the agent collection
 - **Meta-Management**: Advanced agents for context management, workflow optimization, and automation
 
-## 📚 Agent Categories
+## Agent Categories
 
-### 🔧 Development (14 agents)
+### Development (17 agents)
 - `backend-architect` - API design, microservices, database architecture
 - `frontend-specialist` - React, Vue, Angular, modern UI frameworks
 - `python-pro` - Advanced Python, async programming, optimization
@@ -31,71 +32,88 @@ A comprehensive collection of specialized Claude Code sub-agents combining the b
 - `react-pro` - Advanced hooks, performance, state management
 - `vue-specialist` - Vue 3, Composition API, Nuxt 3, Pinia
 - `angular-expert` - Angular 17+, signals, RxJS, enterprise apps
+- `edge-serverless-developer` - Cloudflare Workers, AWS Lambda, Deno Deploy, edge computing
 
-### 🏗️ Infrastructure (7 agents)
+### Infrastructure (9 agents)
 - `devops-engineer` - CI/CD, containerization, Kubernetes
 - `cloud-architect` - AWS, GCP, Azure architecture and optimization
+- `devsecops-engineer` - Security pipeline automation, SAST/SCA, container scanning, SBOM
+- `iac-specialist` - Terraform, Pulumi, CloudFormation, drift detection, policy-as-code
 - `incident-responder` - Production debugging, log analysis, recovery
 - `performance-engineer` - Profiling, optimization, load testing
 - `monitoring-specialist` - Observability, metrics, alerting
 - `deployment-manager` - Release orchestration, rollback strategies
 - `kubernetes-expert` - K8s configuration, helm charts, operators
 
-### ✅ Quality (6 agents)
+### Quality (6 agents)
 - `code-reviewer` - Code quality, security, best practices review
 - `security-auditor` - Vulnerability assessment, penetration testing
 - `test-engineer` - Test automation, strategies, frameworks
 - `e2e-test-specialist` - Playwright, Cypress, test strategies
 - `performance-tester` - Load testing, stress testing, benchmarking
 - `accessibility-auditor` - WCAG compliance, screen reader testing
-- `performance-optimizer` - Performance analysis and optimization
 
-### 🤖 Data & AI (6 agents)
+### Data & AI (7 agents)
 - `ai-engineer` - LLMs, computer vision, NLP, ML systems
+- `agentic-systems-engineer` - Multi-agent orchestration, tool registries, guardrails, evaluation
 - `data-engineer` - ETL pipelines, data warehouses, big data
 - `data-scientist` - Statistical analysis, ML models, visualization
 - `mlops-engineer` - ML pipelines, experiment tracking, deployment
 - `prompt-engineer` - LLM optimization, RAG systems, fine-tuning
 - `analytics-engineer` - dbt, data modeling, BI tools
-- `data-scientist` - Statistical analysis, predictive modeling
-- `mlops-engineer` - ML deployment, monitoring, lifecycle
 
-### 💼 Business & Process (8 agents)
+### Business & Process (6 agents)
 - `project-manager` - Agile, sprint planning, coordination
 - `product-strategist` - Market analysis, roadmapping, metrics
 - `business-analyst` - Business process optimization, gap analysis, ROI calculations
-- `technical-writer` - Technical documentation, multi-format support, API docs
+- `technical-writer` - Human-authored documentation, information architecture, style guides
 - `requirements-analyst` - Requirements engineering, user stories, traceability
 - `api-designer` - OpenAPI/GraphQL specs, REST design, SDK generation
 
-### 🎨 Creative
+### Creative (7 agents)
 - `ux-designer` - User experience, wireframing, design systems
-- `ui-designer` - Visual design, component libraries
-- `content-strategist` - Content planning, SEO, marketing
+- `ui-designer` - Visual design, OKLCH color systems, component specs
+- `content-strategist` - Content strategy, editorial calendars, content audits
+- `brand-designer` - Brand identity systems, token generation, style guides
+- `design-system-engineer` - W3C design tokens, multi-platform transformation, visual regression
+- `copywriter` - UX copy, tone analysis, readability scoring, A/B variants
+- `motion-designer` - Animation systems, scroll-driven animations, performance budgets
 
-### 👔 HR & Agent Management (3 agents)
+### Marketing (7 agents)
+- `seo-specialist` - Technical SEO audits, Core Web Vitals, schema markup, keyword strategy
+- `email-marketer` - Email campaigns, deliverability, segmentation, automation flows
+- `social-media-strategist` - Platform strategy, content calendars, engagement analytics
+- `growth-engineer` - Experimentation frameworks, A/B testing, funnel optimization
+- `content-marketer` - Content pipelines, distribution strategy, performance tracking
+- `conversion-optimizer` - CRO audits, landing page optimization, multivariate testing
+- `ad-specialist` - Paid media campaigns, bid strategy, ROAS optimization
+
+### Communication (4 agents)
+- `presentation-builder` - Slide decks, reveal.js, narrative structure, data visualization
+- `team-communicator` - RFC documents, standup summaries, stakeholder updates
+- `support-writer` - Knowledge base articles, troubleshooting guides, chatbot scripts
+- `changelog-writer` - Release notes, semantic versioning, multi-audience changelogs
+
+### HR & Agent Management (3 agents)
 - `agent-performance-coach` - Agent quality evaluation, scoring rubrics, definition improvement
 - `agent-gap-analyst` - Capability mapping, coverage gap detection, new agent specification
 - `agent-talent-scout` - External agent discovery, candidate evaluation, format adaptation
 
-### 🧠 Meta-Management (5 agents)
+### Meta-Management (5 agents)
 - `context-manager` - Session continuity, memory optimization, distributed state
 - `workflow-optimizer` - CI/CD optimization, build performance, pipeline efficiency
 - `agent-generator` - Dynamic agent creation, DSL implementation, templates
 - `error-detective` - Root cause analysis, stack trace forensics, pattern matching
-- `documentation-writer` - Automated docs generation, multiple output formats
+- `documentation-writer` - Automated code docs, JSDoc/OpenAPI generation, coverage analysis
 
-### 🔮 Specialized Domains (10 agents)
-- `blockchain-developer` - Web3, smart contracts, DeFi
-- `mobile-developer` - Native and cross-platform mobile
+### Specialized Domains (5 agents)
 - `game-developer` - Unity, Unreal Engine 5, Godot 4, procedural generation
-- `iot-engineer` - Embedded systems, edge computing
 - `embedded-engineer` - Arduino, Raspberry Pi, STM32, real-time systems
 - `fintech-specialist` - Payment systems, PCI DSS compliance, fraud detection
 - `healthcare-dev` - HIPAA/FHIR compliance, EHR systems, medical device integration
 - `ecommerce-expert` - Shopping carts, checkout optimization, inventory management
 
-### 🎮 Unreal Engine 5 (6 agents)
+### Unreal Engine 5 (6 agents)
 - `ue5-blueprint-architect` - BP/C++ interfaces, data-driven design, Blueprint best practices
 - `ue5-gameplay-programmer` - GAS, Enhanced Input, game framework architecture, subsystems
 - `ue5-multiplayer-engineer` - Replication, RPCs, dedicated servers, EOS, networked movement
@@ -298,7 +316,7 @@ graph LR
     PO --> R[Report]
 ```
 
-## 📊 Agent Capabilities Matrix
+## Agent Capabilities Matrix
 
 ### Core Development
 | Agent | Languages | Frameworks | Specialization |
@@ -307,14 +325,47 @@ graph LR
 | frontend-specialist | JS/TS, React | Next.js, Vue, Angular | UI/UX, Performance |
 | fullstack-engineer | JS/TS, Python | MERN, Django+React | End-to-end apps |
 | mobile-developer | Swift, Kotlin, Dart | iOS, Android, Flutter | Native & Cross-platform |
+| edge-serverless-developer | JS/TS, Rust | Cloudflare, Lambda, Deno | Edge computing, Serverless |
 
 ### Infrastructure & DevOps
 | Agent | Tools | Platforms | Focus |
 |-------|-------|-----------|--------|
 | devops-engineer | Docker, K8s, Terraform | AWS, GCP, Azure | CI/CD, IaC |
+| devsecops-engineer | Trivy, Semgrep, Snyk | Multi-cloud | Security pipelines, SBOM |
+| iac-specialist | Terraform, Pulumi, CDK | Multi-cloud | Infrastructure as Code |
 | cloud-architect | CloudFormation, ARM | Multi-cloud | Architecture, Cost |
 | kubernetes-expert | Helm, Operators | K8s, OpenShift | Container orchestration |
 | monitoring-specialist | Prometheus, Grafana | DataDog, New Relic | Observability |
+
+### Creative & Design
+| Agent | Focus | Deliverables |
+|-------|-------|-------------|
+| ux-designer | User experience, research | Wireframes, user flows |
+| ui-designer | Visual design, components | OKLCH palettes, specs |
+| brand-designer | Brand identity | Token systems, style guides |
+| design-system-engineer | Design tokens, Storybook | Multi-platform components |
+| copywriter | UX copy, tone analysis | A/B variants, readability |
+| motion-designer | Animation systems | Scroll-driven, transitions |
+| content-strategist | Content strategy | Editorial calendars, audits |
+
+### Marketing & Growth
+| Agent | Focus | Deliverables |
+|-------|-------|-------------|
+| seo-specialist | Technical SEO, CWV | Audit reports, schema markup |
+| email-marketer | Email campaigns | Templates, automation flows |
+| social-media-strategist | Platform strategy | Content calendars, analytics |
+| growth-engineer | Experimentation | A/B frameworks, funnels |
+| content-marketer | Content pipelines | Distribution plans, tracking |
+| conversion-optimizer | CRO, landing pages | Audit reports, MVT plans |
+| ad-specialist | Paid media | Campaign structure, ROAS |
+
+### Communication
+| Agent | Focus | Deliverables |
+|-------|-------|-------------|
+| presentation-builder | Slide decks | reveal.js, narratives |
+| team-communicator | Internal comms | RFCs, standups, updates |
+| support-writer | Help content | KB articles, chatbot scripts |
+| changelog-writer | Release notes | Semantic changelogs |
 
 ### Specialized Domains
 | Agent | Technologies | Compliance | Industry Focus |
@@ -332,7 +383,7 @@ graph LR
 | workflow-optimizer | Pipeline optimization, Performance tuning | CI/CD improvement |
 | agent-generator | Dynamic agent creation, Template generation | Custom workflows |
 | error-detective | Root cause analysis, Pattern detection | Debugging, Troubleshooting |
-| documentation-writer | Multi-format generation, API docs | Automated documentation |
+| documentation-writer | JSDoc/OpenAPI generation, Coverage analysis | Automated documentation |
 
 ### HR & Agent Management
 | Agent | Capabilities | Use Cases |
@@ -381,20 +432,33 @@ curl -sSL https://raw.githubusercontent.com/stretchcloud/claude-code-unified-age
 claude "Build a REST API with authentication"
 ```
 
-## 📈 Recent Updates
+## Recent Updates
 
-### v2.0 - Major Expansion (Latest)
+### v3.0 - HR Audit & Major Expansion (Latest)
+- Ran full **HR Audit** using agent-performance-coach, agent-gap-analyst, and agent-talent-scout
+- **Deepened 6 shallow agents**: backend-architect, python-pro, frontend-specialist, fullstack-engineer, devops-engineer, cloud-architect (each expanded from ~50 lines to 550-877 lines)
+- **Improved orchestrator** with DAG-based dependency resolution, parallel execution engine, and retry logic
+- **Differentiated** technical-writer (human-authored docs) from documentation-writer (automated code docs)
+- **Created 4 new specialist agents**: devsecops-engineer, agentic-systems-engineer, iac-specialist, edge-serverless-developer
+- **Expanded Creative category** from 3 to 7 agents: added brand-designer, design-system-engineer, copywriter, motion-designer
+- **New Marketing category** (7 agents): seo-specialist, email-marketer, social-media-strategist, growth-engineer, content-marketer, conversion-optimizer, ad-specialist
+- **New Communication category** (4 agents): presentation-builder, team-communicator, support-writer, changelog-writer
+
+### v2.1 - UE5 & HR Agents
+- Added 6 **Unreal Engine 5** specialist agents
+- Added 3 **HR & Agent Management** agents for self-improvement
+
+### v2.0 - Major Expansion
 - Added 5 **Meta-Management Agents** for advanced workflow automation
 - Added 4 **Business & Process Agents** for requirements and documentation
 - Added 5 **Specialized Domain Agents** with deep industry expertise
-- Each new agent includes 1000+ lines of production-ready code
-- Enhanced agent capabilities with real-world implementation examples
 
 ### Key Highlights
-- **63 Total Agents** across 10 categories
+- **82 Specialized Agents + 1 Orchestrator = 83 Total** across 12 categories
 - **Production-Ready Code**: Each agent includes comprehensive, tested implementations
 - **Industry Compliance**: HIPAA, PCI DSS, GDPR compliance where applicable
 - **Enterprise Features**: Scalability, security, and best practices built-in
+- **Self-Improving**: HR agents audit quality, detect gaps, and scout external talent
 
 ---
 
