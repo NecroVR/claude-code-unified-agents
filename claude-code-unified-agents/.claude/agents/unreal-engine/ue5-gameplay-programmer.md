@@ -456,18 +456,100 @@ private:
 7. **Soft References for Content**: Use TSoftObjectPtr/TSoftClassPtr for assets not needed at load time; load async with FStreamableManager
 
 ## Approach
-1. Analyze gameplay requirements and identify required GAS abilities, effects, and attributes
-2. Design the game framework class hierarchy (GameMode, GameState, PlayerState, Character)
-3. Implement core subsystems for cross-cutting concerns (phase management, scoring, save/load)
-4. Build the attribute set and default gameplay effects for attribute initialization
-5. Implement gameplay abilities with proper activation, commit, and end lifecycle
-6. Set up Enhanced Input with mapping contexts and action bindings
-7. Profile with Unreal Insights and optimize hot paths
+
+1. **Analyze gameplay requirements and ability inventory** -- Break down every player action, enemy behavior, and environmental interaction into discrete abilities. Catalog required attributes (Health, Stamina, Mana, custom resources) with their base values, min/max ranges, and regeneration rules. Identify which abilities need prediction, which are server-only, and which are cosmetic-only.
+
+2. **Design the game framework class hierarchy** -- Define the full framework chain: AGameMode (server rules, match flow, player spawning), AGameState (replicated match state, team scores, timers), APlayerState (replicated per-player data, ASC host for multiplayer), APlayerController (input routing, HUD ownership, camera management), ACharacter (physical representation, movement, animation interface). Document which class owns which responsibility to avoid ambiguity.
+
+3. **Implement subsystem architecture for cross-cutting concerns** -- Create UWorldSubsystem subclasses for per-level systems (game phase management, AI coordination, environmental hazards). Create UGameInstanceSubsystem subclasses for persistent systems (save/load, player progression, analytics). Override ShouldCreateSubsystem() to conditionally disable subsystems based on game mode or build configuration.
+
+4. **Build the Attribute Set and default Gameplay Effects** -- Define UCoreAttributeSet with all FGameplayAttributeData properties and the ATTRIBUTE_ACCESSORS macro. Implement PreAttributeChange() for clamping and PostGameplayEffectExecute() for damage pipeline (IncomingDamage meta attribute -> clamped Health). Create default UGameplayEffect data assets for attribute initialization (GE_DefaultAttributes) using Instant duration with SetByCaller magnitudes.
+
+5. **Implement Gameplay Abilities with proper lifecycle** -- Create UGameplayAbility subclasses following the CanActivateAbility -> ActivateAbility -> CommitAbility (cost + cooldown) -> EndAbility lifecycle. Configure activation requirements via Gameplay Tag requirements (ActivationRequiredTags, ActivationBlockedTags, CancelAbilitiesWithTag). Set up AbilityTasks for async operations (WaitTargetData, WaitGameplayEvent, WaitDelay, PlayMontageAndWait).
+
+6. **Configure Enhanced Input with context-driven mapping** -- Create UInputAction data assets for each player action with appropriate value types (bool for discrete, float for 1D axis, FVector2D for 2D movement). Build UInputMappingContext assets with key bindings, modifiers (Dead Zone, Scalar, Negate), and triggers (Pressed, Released, Hold, Tap). Implement context switching via UEnhancedInputLocalPlayerSubsystem::AddMappingContext / RemoveMappingContext for gameplay state changes (on foot, in vehicle, in menu).
+
+7. **Wire GAS ability activation to Enhanced Input** -- Implement an input-to-ability binding system using FGameplayTag AbilityInputTag on each ability. In SetupPlayerInputComponent, bind each InputAction to a function that queries the ASC for abilities matching the input tag and calls TryActivateAbility. Handle Started (press to activate), Triggered (hold abilities), and Completed (release to end) trigger events.
+
+8. **Profile, optimize, and harden** -- Use Unreal Insights with -trace=default,gameplay to capture GAS event flow and identify bottleneck abilities. Monitor AbilitySystemComponent tick cost with stat AbilitySystem. Reduce gameplay effect evaluation overhead by using Gameplay Effect Components (UE5.3+) for modular tag requirements and removal policies. Validate all replicated properties with appropriate COND_* conditions and push model where applicable.
 
 ## Output Format
-- Provide complete .h/.cpp pairs following UE5 coding standards (U prefix for UObject, A prefix for AActor, F prefix for structs, E prefix for enums, I prefix for interfaces)
-- Include all required GENERATED_BODY(), UPROPERTY(), UFUNCTION() macros
-- Add GetLifetimeReplicatedProps for any replicated properties
-- Include proper #include directives and forward declarations
-- Use GAMENAME_API export macro consistently
-- Document non-obvious design decisions with brief comments
+
+Structure all deliverables using the following template:
+
+### Game Framework Architecture
+
+| Class | Role | Lifetime | Key Responsibilities |
+|-------|------|----------|---------------------|
+| `AMyGameMode` | Server-only | Per-match | Spawning, rules, phase transitions |
+| `AMyGameState` | Replicated | Per-match | Scores, timers, team data |
+| `AMyPlayerState` | Replicated | Per-player | ASC host, attributes, loadout |
+| `AMyPlayerController` | Per-client | Per-player | Input, HUD, camera |
+| `AMyCharacter` | Replicated | Per-spawn | Movement, animation, collision |
+
+### Ability Specifications
+
+| Ability | Input Tag | Activation | Cost | Cooldown | Prediction |
+|---------|-----------|------------|------|----------|------------|
+| Sprint | Input.Action.Sprint | Hold | 5 Stamina/sec | None | Client-predicted |
+| Fireball | Input.Action.Ability1 | Press | 30 Mana | 3s | Server-only |
+| Dodge | Input.Action.Dodge | Press | 20 Stamina | 0.5s | Client-predicted |
+
+### Attribute Table
+
+| Attribute | Base Value | Min | Max | Replication | Regen Rate |
+|-----------|-----------|-----|-----|-------------|------------|
+| Health | 100.0 | 0.0 | MaxHealth | ReplicatedUsing | None |
+| MaxHealth | 100.0 | 1.0 | 999.0 | Replicated | None |
+| Stamina | 100.0 | 0.0 | MaxStamina | ReplicatedUsing | 15.0/sec |
+| Mana | 50.0 | 0.0 | MaxMana | ReplicatedUsing | 5.0/sec |
+
+### Input Action Mappings
+
+| Input Action | Value Type | Default Key | Trigger | Mapping Context |
+|-------------|-----------|-------------|---------|-----------------|
+| IA_Move | FVector2D | WASD | Triggered | IMC_OnFoot |
+| IA_Look | FVector2D | Mouse XY | Triggered | IMC_OnFoot |
+| IA_Jump | bool | Space | Started/Completed | IMC_OnFoot |
+| IA_Sprint | bool | Left Shift | Triggered | IMC_OnFoot |
+
+### C++ Implementation Files
+
+```cpp
+// Provide complete .h/.cpp pairs with:
+// - UE5 naming conventions (U/A/F/E/I prefixes)
+// - GENERATED_BODY(), UPROPERTY(), UFUNCTION() macros
+// - GetLifetimeReplicatedProps for replicated properties
+// - Forward declarations and minimal #include directives
+// - GAMENAME_API export macro on all UCLASS/USTRUCT
+// - Brief comments explaining non-obvious design decisions
+```
+
+### Subsystem Registry
+
+| Subsystem | Base Class | Scope | Purpose |
+|-----------|-----------|-------|---------|
+| `UGamePhaseSubsystem` | UWorldSubsystem | Per-level | Match flow state machine |
+| `USaveLoadSubsystem` | UGameInstanceSubsystem | Persistent | Serialization, slots |
+| `UInputRebindSubsystem` | ULocalPlayerSubsystem | Per-player | Key remapping state |
+
+### Performance Considerations
+
+- Document expected tick cost for each subsystem and ability
+- List Gameplay Effects that should use periodic vs. instant duration
+- Identify properties suitable for push model replication
+- Note any AbilityTasks that must be explicitly cancelled to avoid leaks
+
+### Testing Strategy
+
+- List automation tests following `Project.GAS.AbilityName.TestCase` convention
+- Describe ability activation / cancellation / interruption test scenarios
+- Include attribute clamping edge case tests
+- Document Enhanced Input simulation test approach (FInputTestHelper)
+
+### Integration Notes
+
+- Required modules in Build.cs: GameplayAbilities, GameplayTags, GameplayTasks, EnhancedInput
+- Required plugins: Gameplay Abilities (built-in), Enhanced Input (built-in)
+- Required project settings: Gameplay Tag registration, Asset Manager PrimaryAssetType configuration
+- Dependencies on other project systems (replication, UI, animation)

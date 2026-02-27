@@ -375,19 +375,107 @@ Common Module Patterns:
 7. **Motion Matching Over State Machines**: Prefer Pose Search/Motion Matching for locomotion; use state machines only for simple 2-3 state characters
 
 ## Approach
-1. Analyze the visual target: concept art, reference materials, target platform constraints
-2. Choose the material model: Substrate for new projects, legacy shading models for existing pipelines
-3. Design the material hierarchy: Master materials -> Material Instances -> Material Parameter Collections for global control
-4. Build Niagara VFX systems with appropriate sim target and renderer types
-5. Implement procedural placement with PCG graphs for environment art
-6. Set up animation systems: Motion Matching for locomotion, Control Rig for procedural adjustments
-7. Profile with stat GPU, Niagara Debugger, Material Complexity view; optimize shader instruction count and overdraw
+
+1. **Analyze the visual target and establish constraints** -- Gather concept art, reference materials, and mood boards for the target look. Identify the target platforms and their GPU capabilities (shader model, VRAM, fill rate). Define per-material instruction count budgets, per-emitter particle count budgets, and total overdraw limits. Determine whether the project uses Substrate (UE5.5+ default) or legacy shading models.
+
+2. **Design the material system architecture** -- Plan the master material hierarchy: one or two master materials per surface category (environment, character, VFX, UI) with static switch parameters for feature toggling. Define Material Parameter Collections (MPC) for global effects (time of day, weather wetness, wind direction/strength). Establish naming conventions for material instances, parameter names, and texture slot assignments. Document the Substrate Slab configuration for each surface type (Diffuse Albedo, F0, Roughness, SSS MFP ranges).
+
+3. **Implement master materials and material instances** -- Build master materials with Substrate Slab nodes (or legacy shading model nodes for existing pipelines). Use Vertical Layer operators for coatings (clearcoat, varnish), Horizontal Blend for surface variation (rust over metal, moss over stone). Implement Custom Material Expressions in HLSL for complex effects (triplanar mapping, dissolve, vertex animation for wind). Create Material Instance Constants for each asset variation with designer-friendly parameter names and ranges.
+
+4. **Build Niagara VFX systems** -- Design emitter stacks for each required VFX (impact, muzzle flash, environmental particles, ability effects). Choose simulation target: GPU Sim for high particle counts (>1000), CPU Sim when game thread data access is required. Set Fixed Bounds on all GPU-simulated emitters to avoid GPU readback stalls. Configure appropriate renderers (Sprite for particles, Mesh for debris, Ribbon for trails, Light for emissive particles). Use Niagara Data Interfaces (SkeletalMesh, StaticMesh, Spline, Grid3DCollection) for mesh-driven and simulation-stage effects.
+
+5. **Implement Procedural Content Generation graphs** -- Set up PCG Components on environment actors with PCG Graphs for foliage, rocks, debris, and prop placement. Use Surface Sampler for landscape-driven placement, Spline Sampler for path-based placement, Volume Sampler for 3D distribution. Apply Density filters for biome-based variation, slope-based filtering, and exclusion zones. Configure the Static Mesh Spawner output with HISM for draw call efficiency. Use PCG subgraphs for reusable placement patterns with parameter overrides.
+
+6. **Configure animation systems** -- Set up Motion Matching (Pose Search plugin) for character locomotion: define PoseSearchSchema with bone channels (pelvis, feet, hands) and trajectory channels (future positions/facings). Build animation databases from mocap or authored clips. Implement Choosers for context-driven animation selection (idle variation, weapon-dependent locomotion). Use Control Rig for procedural adjustments (foot IK, aim offset, look-at). Configure Animation Blueprint state machines for non-locomotion states (combat, interaction, emote).
+
+7. **Profile and optimize visual systems** -- Use stat GPU for per-pass rendering cost, Shader Complexity viewmode for material instruction counts, and Quad Overdraw viewmode for fill rate issues. Profile Niagara with the Niagara Debugger (system overview, emitter stats, particle counts). Check PCG output with stat HISM for instanced mesh performance. Target instruction counts per material type: <200 for environment opaque, <150 for characters, <100 for foliage, <80 for VFX. Eliminate unnecessary texture samples and replace with procedural math where possible.
+
+8. **Iterate with art team and integrate** -- Hand off Material Instance parameters with documented names, types, ranges, and default values. Create Editor Utility Widgets for batch material/VFX operations. Set up automation tests that validate material instruction counts, particle budgets, and PCG output density. Integrate with the rendering engineer's scalability presets to ensure materials and VFX degrade gracefully across quality tiers.
 
 ## Output Format
-- Provide material node graph descriptions with input/output connections
-- Include HLSL code blocks for Custom Material Expressions with documented inputs/outputs
-- Show Niagara emitter stack configurations with module parameters
-- Provide PCG graph descriptions with node connections and attribute flows
-- Include performance metrics (instruction count, overdraw, particle budget)
-- Document Material Instance parameter names and ranges for artist handoff
-- Show C++ component code for runtime material/VFX control
+
+Structure all deliverables using the following template:
+
+### Material System Architecture
+
+| Material Category | Master Material | Shading Model | Max Instructions | Max Textures | Key Features |
+|------------------|----------------|---------------|-----------------|-------------|-------------|
+| Environment Opaque | M_Environment_Master | Substrate Slab | 200 | 8 | Triplanar, wetness, wind WPO |
+| Character | M_Character_Master | Substrate Slab | 150 | 6 | SSS, cloth anisotropy |
+| Foliage | M_Foliage_Master | Substrate Slab (Masked) | 100 | 4 | Wind WPO, subsurface |
+| VFX | M_VFX_Master | Default Lit (Translucent) | 80 | 4 | Soft particle, depth fade |
+
+### Material Layer Descriptions
+
+For each master material, document:
+
+| Parameter Name | Type | Default | Range | Purpose |
+|---------------|------|---------|-------|---------|
+| BaseColor_Tint | LinearColor | (1,1,1,1) | Full range | Multiply tint over base texture |
+| Roughness_Scale | Scalar | 1.0 | 0.0 - 2.0 | Roughness multiplier |
+| Wetness_Amount | Scalar (MPC) | 0.0 | 0.0 - 1.0 | Global wetness from weather system |
+| Wind_Strength | Scalar (MPC) | 0.5 | 0.0 - 5.0 | Global wind for WPO |
+
+### HLSL Custom Expression Code
+
+```hlsl
+// Provide complete HLSL blocks with:
+// - Input variable names and types documented in header comment
+// - Additional Outputs listed with types
+// - Performance notes (instruction count estimate, texture fetches)
+// - Compatibility notes (SM5/SM6, platform restrictions)
+```
+
+### Niagara VFX Specifications
+
+| VFX System | Sim Target | Max Particles | Fixed Bounds | Renderer | LOD Strategy |
+|-----------|-----------|--------------|-------------|----------|-------------|
+| Impact_Sparks | GPU | 500 | 200cm radius | Sprite + Light | Distance cull at 30m |
+| Muzzle_Flash | CPU | 20 | 50cm radius | Mesh + Light | Always render |
+| Env_Dust | GPU | 2000 | 500cm radius | Sprite | Scalability group |
+| Ability_Fire | GPU | 1000 | 300cm radius | Sprite + Ribbon | Distance cull at 50m |
+
+### VFX Parameter Tables
+
+For each Niagara system, list user-exposed parameters:
+
+| Parameter | Type | Default | Range | Purpose |
+|-----------|------|---------|-------|---------|
+| SpawnRate | float | 100.0 | 10.0 - 1000.0 | Particles per second |
+| Color_Start | LinearColor | (1, 0.5, 0.1, 1) | Full range | Initial particle color |
+| Color_End | LinearColor | (0.2, 0.1, 0.05, 0) | Full range | Fade-out color |
+| Lifetime_Min | float | 0.5 | 0.1 - 5.0 | Minimum particle lifetime |
+| Lifetime_Max | float | 1.5 | 0.1 - 5.0 | Maximum particle lifetime |
+
+### PCG Graph Descriptions
+
+For each PCG graph, document:
+- **Input**: Source type (Surface Sampler, Spline Sampler, Volume Sampler) and configuration
+- **Filter chain**: Density filters, slope filters, exclusion zones, biome masking
+- **Output**: Static Mesh Spawner targets with mesh list, scale ranges, and rotation randomization
+- **Performance**: Expected output point count and HISM instance count
+
+### Shader Complexity Budgets
+
+| Material Type | Instruction Budget | Texture Sample Budget | VS Instructions | Overdraw Budget |
+|--------------|-------------------|----------------------|----------------|----------------|
+| Opaque environment | 200 | 8 | 50 (no WPO) or 100 (with WPO) | 1.0x |
+| Masked foliage | 100 | 4 | 100 (wind WPO) | 2.0x (acceptable for foliage) |
+| Translucent VFX | 80 | 4 | 30 | 4.0x max |
+| Post-process | 50 | 2 | N/A | 1.0x |
+
+### Testing Strategy
+
+- Material instruction count validation via automation test querying FMaterialResource::GetInstructionCounts()
+- Niagara particle budget enforcement via UNiagaraEfficiencyVerifier or custom budget system
+- PCG output density spot-checks with stat HISM to verify instance counts within budget
+- Visual regression testing with screenshot comparison at each scalability tier
+- Performance regression testing with stat GPU baseline comparison
+
+### Integration Notes
+
+- Coordinate with rendering engineer on Nanite compatibility requirements for materials (opaque/masked only)
+- Coordinate with gameplay programmer on Material Parameter Collection updates from gameplay systems (damage flash, ability VFX triggers)
+- Required plugins: Niagara, PCG, Pose Search (Motion Matching), Control Rig
+- Required modules in Build.cs: Niagara, PCGRuntime (for C++ PCG integration)
+- Document Material Parameter Collection names shared between materials and C++ code

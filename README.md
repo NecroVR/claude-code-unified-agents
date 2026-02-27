@@ -1,10 +1,10 @@
 # Claude Code Unified Agents
 
-A comprehensive collection of specialized Claude Code sub-agents combining the best features from multiple community repositories. This unified collection provides 82 production-ready agents across development, infrastructure, quality, AI/ML, business, creative, marketing, communication, meta-management, HR & agent management, Unreal Engine 5, and specialized domains.
+A comprehensive collection of specialized Claude Code sub-agents combining the best features from multiple community repositories. This unified collection provides 91 production-ready agents across development, infrastructure, quality, AI/ML, business, creative, marketing, communication, meta-management, HR & agent management, Unreal Engine 5, and specialized domains.
 
 ## Features
 
-- **82 Production-Ready Agents**: Comprehensive coverage across 12 categories
+- **91 Production-Ready Agents**: Comprehensive coverage across 12 categories
 - **Smart Orchestration**: Master orchestrator for complex multi-agent workflows
 - **Category Organization**: Agents organized by expertise domain for easy discovery
 - **Deep Specialization**: Each agent includes production-ready code examples and implementation patterns
@@ -15,14 +15,14 @@ A comprehensive collection of specialized Claude Code sub-agents combining the b
 
 ## Agent Categories
 
-### Development (17 agents)
+### Development (20 agents)
 - `backend-architect` - API design, microservices, database architecture
 - `frontend-specialist` - React, Vue, Angular, modern UI frameworks
 - `python-pro` - Advanced Python, async programming, optimization
 - `fullstack-engineer` - End-to-end application development
+- `database-specialist` - SQL/NoSQL schema design, query optimization, migration management
 - `mobile-developer` - iOS, Android, React Native, Flutter
-- `blockchain-developer` - Smart contracts, Web3, DeFi
-- `database-specialist` - SQL/NoSQL design, optimization, management
+- `blockchain-developer` - Solidity, Hardhat, DeFi protocols, smart contract security
 - `rust-pro` - Systems programming, memory safety, WebAssembly
 - `golang-pro` - Concurrent programming, microservices, cloud-native
 - `typescript-pro` - Advanced type systems, large-scale applications
@@ -33,25 +33,32 @@ A comprehensive collection of specialized Claude Code sub-agents combining the b
 - `vue-specialist` - Vue 3, Composition API, Nuxt 3, Pinia
 - `angular-expert` - Angular 17+, signals, RxJS, enterprise apps
 - `edge-serverless-developer` - Cloudflare Workers, AWS Lambda, Deno Deploy, edge computing
+- `legacy-modernizer` - Codebase health analysis, migration planning, strangler fig pattern
+- `cli-developer` - CLI design, argument parsing, interactive prompts, plugin systems
+- `i18n-specialist` - Internationalization, ICU MessageFormat, CLDR, RTL support
 
-### Infrastructure (9 agents)
+### Infrastructure (12 agents)
 - `devops-engineer` - CI/CD, containerization, Kubernetes
 - `cloud-architect` - AWS, GCP, Azure architecture and optimization
 - `devsecops-engineer` - Security pipeline automation, SAST/SCA, container scanning, SBOM
 - `iac-specialist` - Terraform, Pulumi, CloudFormation, drift detection, policy-as-code
+- `sre-engineer` - SLO/SLI management, error budgets, toil reduction, capacity planning
+- `platform-engineer` - Internal developer platforms, golden paths, self-service infrastructure
+- `build-engineer` - Build system optimization, bundler configuration, monorepo tooling
 - `incident-responder` - Production debugging, log analysis, recovery
 - `performance-engineer` - Profiling, optimization, load testing
 - `monitoring-specialist` - Observability, metrics, alerting
 - `deployment-manager` - Release orchestration, rollback strategies
 - `kubernetes-expert` - K8s configuration, helm charts, operators
 
-### Quality (6 agents)
-- `code-reviewer` - Code quality, security, best practices review
-- `security-auditor` - Vulnerability assessment, penetration testing
-- `test-engineer` - Test automation, strategies, frameworks
+### Quality (7 agents)
+- `code-reviewer` - AST-based code analysis, complexity scoring, security pattern detection
+- `security-auditor` - OWASP vulnerability scanning, dependency auditing, secrets detection
+- `test-engineer` - Unit/integration test strategy, TDD/BDD, mutation testing, coverage optimization
 - `e2e-test-specialist` - Playwright, Cypress, test strategies
 - `performance-tester` - Load testing, stress testing, benchmarking
 - `accessibility-auditor` - WCAG compliance, screen reader testing
+- `threat-modeler` - STRIDE threat modeling, attack trees, trust boundary analysis
 
 ### Data & AI (7 agents)
 - `ai-engineer` - LLMs, computer vision, NLP, ML systems
@@ -62,13 +69,15 @@ A comprehensive collection of specialized Claude Code sub-agents combining the b
 - `prompt-engineer` - LLM optimization, RAG systems, fine-tuning
 - `analytics-engineer` - dbt, data modeling, BI tools
 
-### Business & Process (6 agents)
-- `project-manager` - Agile, sprint planning, coordination
-- `product-strategist` - Market analysis, roadmapping, metrics
+### Business & Process (8 agents)
+- `project-manager` - Agile sprint planning, velocity tracking, burndown charts, risk management
+- `product-strategist` - Market sizing, RICE prioritization, roadmapping, pricing simulation
 - `business-analyst` - Business process optimization, gap analysis, ROI calculations
 - `technical-writer` - Human-authored documentation, information architecture, style guides
 - `requirements-analyst` - Requirements engineering, user stories, traceability
 - `api-designer` - OpenAPI/GraphQL specs, REST design, SDK generation
+- `research-analyst` - Market research, technology evaluation, TAM/SAM/SOM, source credibility
+- `competitive-analyst` - Competitive landscape mapping, feature comparison, battle cards
 
 ### Creative (7 agents)
 - `ux-designer` - User experience, wireframing, design systems
@@ -434,15 +443,21 @@ claude "Build a REST API with authentication"
 
 ## Recent Updates
 
-### v3.0 - HR Audit & Major Expansion (Latest)
+### v4.0 - Second HR Audit & Full Coverage (Latest)
+- Ran **second full HR audit** on all 83 agents — identified 10 Grade C agents and 9 new agent gaps
+- **Deepened 10 Grade C agents**: ai-engineer, data-engineer, security-auditor, code-reviewer, test-engineer, ux-designer, database-specialist, blockchain-developer, project-manager, product-strategist (each expanded from ~100-200 lines to 1,100-2,100+ lines)
+- **Created 9 new agents**: research-analyst, competitive-analyst, legacy-modernizer, sre-engineer, threat-modeler, i18n-specialist, platform-engineer, cli-developer, build-engineer
+- **Improved 6 UE5 agents** with structured Approach and Output Format sections
+- **Fixed tool frontmatter** on api-designer and business-analyst (added Bash)
+
+### v3.0 - First HR Audit & Major Expansion
 - Ran full **HR Audit** using agent-performance-coach, agent-gap-analyst, and agent-talent-scout
-- **Deepened 6 shallow agents**: backend-architect, python-pro, frontend-specialist, fullstack-engineer, devops-engineer, cloud-architect (each expanded from ~50 lines to 550-877 lines)
+- **Deepened 6 shallow agents**: backend-architect, python-pro, frontend-specialist, fullstack-engineer, devops-engineer, cloud-architect
 - **Improved orchestrator** with DAG-based dependency resolution, parallel execution engine, and retry logic
 - **Differentiated** technical-writer (human-authored docs) from documentation-writer (automated code docs)
 - **Created 4 new specialist agents**: devsecops-engineer, agentic-systems-engineer, iac-specialist, edge-serverless-developer
-- **Expanded Creative category** from 3 to 7 agents: added brand-designer, design-system-engineer, copywriter, motion-designer
-- **New Marketing category** (7 agents): seo-specialist, email-marketer, social-media-strategist, growth-engineer, content-marketer, conversion-optimizer, ad-specialist
-- **New Communication category** (4 agents): presentation-builder, team-communicator, support-writer, changelog-writer
+- **Expanded Creative category** from 3 to 7 agents
+- **New Marketing category** (7 agents) and **Communication category** (4 agents)
 
 ### v2.1 - UE5 & HR Agents
 - Added 6 **Unreal Engine 5** specialist agents
@@ -454,7 +469,7 @@ claude "Build a REST API with authentication"
 - Added 5 **Specialized Domain Agents** with deep industry expertise
 
 ### Key Highlights
-- **82 Specialized Agents + 1 Orchestrator = 83 Total** across 12 categories
+- **91 Specialized Agents + 1 Orchestrator = 92 Total** across 12 categories
 - **Production-Ready Code**: Each agent includes comprehensive, tested implementations
 - **Industry Compliance**: HIPAA, PCI DSS, GDPR compliance where applicable
 - **Enterprise Features**: Scalability, security, and best practices built-in

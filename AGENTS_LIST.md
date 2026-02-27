@@ -3,14 +3,14 @@
 ## 🎯 Core Orchestrator
 - **orchestrator** - Master coordinator for complex multi-agent workflows
 
-## 💻 Development (17 agents)
+## 💻 Development (20 agents)
 - **backend-architect** - API design, microservices, database architecture
 - **frontend-specialist** - React, Vue, Angular, modern UI frameworks
 - **python-pro** - Advanced Python, async programming, optimization
 - **fullstack-engineer** - End-to-end application development
-- **database-specialist** - SQL/NoSQL design, optimization, management
+- **database-specialist** - SQL/NoSQL schema design, query optimization, migration management
 - **mobile-developer** - iOS, Android, React Native, Flutter
-- **blockchain-developer** - Smart contracts, Web3, DeFi
+- **blockchain-developer** - Solidity, Hardhat, DeFi protocols, smart contract security
 - **rust-pro** - Systems programming, memory safety, WebAssembly
 - **golang-pro** - Concurrent programming, microservices, cloud-native
 - **typescript-pro** - Advanced type systems, large-scale applications
@@ -21,25 +21,32 @@
 - **vue-specialist** - Vue 3, Composition API, Nuxt 3, Pinia
 - **angular-expert** - Angular 17+, signals, RxJS, enterprise apps
 - **edge-serverless-developer** - Cloudflare Workers, AWS Lambda, Deno Deploy, edge computing
+- **legacy-modernizer** - Codebase health analysis, migration planning, strangler fig pattern
+- **cli-developer** - CLI design, argument parsing, interactive prompts, plugin systems
+- **i18n-specialist** - Internationalization, ICU MessageFormat, CLDR, RTL support, translation workflows
 
-## 🏗️ Infrastructure (9 agents)
+## 🏗️ Infrastructure (12 agents)
 - **devops-engineer** - CI/CD, containerization, Kubernetes, automation
 - **cloud-architect** - AWS, GCP, Azure architecture and optimization
 - **devsecops-engineer** - Security pipeline automation, SAST/SCA, container scanning, SBOM
 - **iac-specialist** - Terraform, Pulumi, CloudFormation, drift detection, policy-as-code
+- **sre-engineer** - SLO/SLI management, error budgets, toil reduction, capacity planning
+- **platform-engineer** - Internal developer platforms, golden paths, self-service infrastructure
+- **build-engineer** - Build system optimization, bundler configuration, monorepo tooling
 - **incident-responder** - Production debugging, log analysis, recovery
 - **performance-engineer** - Profiling, optimization, load testing
 - **monitoring-specialist** - Observability, metrics, alerting
 - **deployment-manager** - Release orchestration, rollback strategies
 - **kubernetes-expert** - K8s configuration, helm charts, operators
 
-## ✅ Quality Assurance (6 agents)
-- **code-reviewer** - Code quality, security, best practices review
-- **security-auditor** - Vulnerability assessment, penetration testing
-- **test-engineer** - Test automation, strategies, frameworks
+## ✅ Quality Assurance (7 agents)
+- **code-reviewer** - AST-based code analysis, complexity scoring, security pattern detection
+- **security-auditor** - OWASP vulnerability scanning, dependency auditing, secrets detection
+- **test-engineer** - Unit/integration test strategy, TDD/BDD, mutation testing, coverage optimization
 - **e2e-test-specialist** - Playwright, Cypress, test strategies
 - **performance-tester** - Load testing, stress testing, benchmarking
 - **accessibility-auditor** - WCAG compliance, screen reader testing
+- **threat-modeler** - STRIDE threat modeling, attack trees, trust boundary analysis, DREAD scoring
 
 ## 🤖 Data & AI (7 agents)
 - **ai-engineer** - LLMs, computer vision, NLP, ML systems
@@ -50,13 +57,15 @@
 - **prompt-engineer** - LLM optimization, RAG systems, fine-tuning
 - **analytics-engineer** - dbt, data modeling, BI tools
 
-## 💼 Business & Process (6 agents)
-- **project-manager** - Agile, sprint planning, team coordination
-- **product-strategist** - Market analysis, roadmapping, metrics
+## 💼 Business & Process (8 agents)
+- **project-manager** - Agile sprint planning, velocity tracking, burndown charts, risk management
+- **product-strategist** - Market sizing, RICE prioritization, roadmapping, pricing simulation
 - **business-analyst** - Business process optimization, gap analysis, ROI
 - **technical-writer** - Human-authored documentation, information architecture, style guides
 - **requirements-analyst** - Requirements engineering, user stories, traceability
 - **api-designer** - OpenAPI/GraphQL specs, REST design, SDK generation
+- **research-analyst** - Market research, technology evaluation, TAM/SAM/SOM, source credibility
+- **competitive-analyst** - Competitive landscape mapping, feature comparison, battle cards, SWOT
 
 ## 🎨 Creative (7 agents)
 - **ux-designer** - User experience, wireframing, design systems
@@ -124,6 +133,7 @@
 @vue-specialist             # Vue.js projects
 @angular-expert             # Angular enterprise apps
 @edge-serverless-developer  # Edge/serverless apps
+@i18n-specialist            # Internationalization
 ```
 
 ### For Mobile Development
@@ -135,6 +145,7 @@
 ```
 @rust-pro            # Rust systems programming
 @golang-pro          # Go microservices
+@cli-developer       # CLI tool development
 @embedded-engineer   # IoT and embedded systems
 ```
 
@@ -153,8 +164,11 @@
 ```
 @devops-engineer       # CI/CD, Kubernetes
 @devsecops-engineer    # Security pipelines
+@sre-engineer          # SLOs, error budgets
 @cloud-architect       # AWS, GCP, Azure
 @iac-specialist        # Terraform, Pulumi, IaC
+@platform-engineer     # Internal developer platforms
+@build-engineer        # Build systems, monorepos
 @kubernetes-expert     # K8s expertise
 @monitoring-specialist # Observability
 @deployment-manager    # Release management
@@ -165,11 +179,19 @@
 ```
 @code-reviewer         # Code quality
 @security-auditor      # Security review
+@threat-modeler        # STRIDE threat modeling
 @devsecops-engineer    # Security automation
-@test-engineer         # Testing strategies
+@test-engineer         # Unit/integration testing
 @e2e-test-specialist   # E2E testing
 @performance-tester    # Load testing
 @accessibility-auditor # A11y compliance
+```
+
+### For Modernization & Refactoring
+```
+@legacy-modernizer     # Codebase migration
+@cli-developer         # CLI tool development
+@build-engineer        # Build optimization
 ```
 
 ### For Design & Creative
@@ -208,6 +230,8 @@
 @product-strategist    # Product strategy
 @business-analyst      # Process optimization
 @requirements-analyst  # Requirements engineering
+@research-analyst      # Market research
+@competitive-analyst   # Competitive intelligence
 @technical-writer      # Documentation
 @api-designer          # API design
 ```
@@ -376,11 +400,11 @@ cd claude-code-unified-agents
 
 | Category | Count | Focus Area |
 |----------|-------|------------|
-| Development | 17 | Programming languages, frameworks, edge/serverless |
-| Infrastructure | 9 | DevOps, cloud, security pipelines, IaC |
-| Quality Assurance | 6 | Testing, security, performance |
+| Development | 20 | Programming languages, frameworks, edge/serverless, CLI, i18n, modernization |
+| Infrastructure | 12 | DevOps, cloud, SRE, platform engineering, build systems, IaC |
+| Quality Assurance | 7 | Testing, security, threat modeling, performance |
 | Data & AI | 7 | ML, agentic systems, data processing, analytics |
-| Business & Process | 6 | Management, documentation, analysis |
+| Business & Process | 8 | Management, research, competitive intelligence, documentation |
 | Creative | 7 | Design systems, brand, UX copy, animation |
 | Marketing | 7 | SEO, email, social, growth, ads, CRO |
 | Communication | 4 | Presentations, RFCs, support docs, changelogs |
@@ -389,7 +413,7 @@ cd claude-code-unified-agents
 | Specialized Domains | 5 | Industry-specific expertise |
 | Unreal Engine 5 | 6 | UE5 development specialists |
 
-**Total Agents: 82 specialized agents + 1 orchestrator = 83 total**
+**Total Agents: 91 specialized agents + 1 orchestrator = 92 total**
 
 ## Key Features
 
@@ -403,4 +427,4 @@ cd claude-code-unified-agents
 
 ---
 
-*Last Updated: Latest Version (v3.0) - 82 Production-Ready Agents + 1 Orchestrator*
+*Last Updated: Latest Version (v4.0) - 91 Production-Ready Agents + 1 Orchestrator*

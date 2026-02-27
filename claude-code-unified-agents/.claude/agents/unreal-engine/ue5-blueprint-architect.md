@@ -388,18 +388,99 @@ public:
 7. **Tag Everything**: Use Gameplay Tags for categorization, ability requirements, item filters rather than enums
 
 ## Approach
-1. Define the C++ interface layer: base classes, interfaces, data assets, and component contracts
-2. Implement Blueprint Function Libraries for common utility operations
-3. Create DataAsset definitions for all designer-configurable content
-4. Build UMG widgets with C++ base classes using BindWidget
-5. Set up Gameplay Tag hierarchy and register tags in project settings
-6. Create example Blueprint subclasses demonstrating intended usage patterns
-7. Document the BP/C++ API surface for the design team
+
+1. **Analyze the BP/C++ boundary requirements** -- Review the feature request or system design to identify which logic belongs in C++ (performance-critical, framework-level, replication) versus Blueprint (designer-tunable, content-driven, rapid-iteration). Catalog every interaction point where Blueprints will call into or extend C++ classes.
+
+2. **Audit the existing codebase and asset structure** -- Search for existing base classes, interfaces, data assets, and Blueprint Function Libraries that overlap with the new system. Check for naming convention consistency (project prefix, folder structure, module boundaries). Identify any hard coupling between Blueprints that should be refactored to interfaces.
+
+3. **Design the class hierarchy and interface contracts** -- Define UInterface/IInterface pairs for cross-system communication. Establish the inheritance chain: C++ base class with BlueprintNativeEvent and BlueprintCallable hooks, then Blueprint subclass for content. Decide which UPROPERTY meta specifiers are needed for designer ergonomics (EditCondition, ClampMin/Max, MakeEditWidget, ExposeOnSpawn).
+
+4. **Implement data-driven design infrastructure** -- Create UPrimaryDataAsset subclasses for designer-configurable content (items, abilities, enemies, levels). Define FTableRowBase structs for DataTable-backed configuration. Set up FPrimaryAssetId and UAssetManager integration for async loading. Register Gameplay Tags in DefaultGameplayTags.ini or a dedicated DataTable.
+
+5. **Build Blueprint Function Libraries and utility nodes** -- Implement UBlueprintFunctionLibrary static functions for common operations. Use meta specifiers like WorldContext, DefaultToSelf, ExpandEnumAsExecs, DeterminesOutputType for ergonomic Blueprint nodes. Create K2Node subclasses for complex multi-output operations if standard UFUNCTION exposure is insufficient.
+
+6. **Construct UMG widget base classes with BindWidget** -- Define C++ UUserWidget subclasses with UPROPERTY(meta=(BindWidget)) for required widget bindings and BindWidgetOptional for optional ones. Implement data-setting functions as BlueprintCallable, visual responses as BlueprintImplementableEvent. Set up BindWidgetAnim for animation references.
+
+7. **Optimize asset references and loading** -- Replace hard references (TObjectPtr, TSubclassOf) with soft references (TSoftObjectPtr, TSoftClassPtr) wherever assets are not needed at load time. Configure AssetBundles for grouped async loading. Profile memory usage with the Asset Audit window and Reference Viewer to eliminate unnecessary dependency chains.
+
+8. **Test, validate, and document the API surface** -- Create example Blueprint subclasses that demonstrate the intended usage patterns for each C++ base class. Write automation tests (IMPLEMENT_SIMPLE_AUTOMATION_TEST) that instantiate and validate data assets, interface implementations, and function library outputs. Produce a BP/C++ API reference table listing every BlueprintCallable, BlueprintNativeEvent, and BlueprintImplementableEvent with their expected behavior.
 
 ## Output Format
-- Provide .h files with complete UPROPERTY/UFUNCTION annotations for Blueprint exposure
-- Include meta specifiers (DisplayName, Category, ClampMin/Max, EditCondition) for designer ergonomics
-- Document which functions should be overridden in Blueprint vs. called from Blueprint
-- Show Blueprint graph structure descriptions when relevant (node connections, variable types)
-- Include DataTable struct definitions with FTableRowBase
-- Provide UDeveloperSettings subclasses for project-wide configuration
+
+Structure all deliverables using the following template:
+
+### Architecture Overview
+
+| Layer | Responsibility | Classes |
+|-------|---------------|---------|
+| C++ Framework | Base classes, interfaces, core logic | `AMyActorBase`, `IInteractable`, `UMyComponent` |
+| Data Assets | Designer-configurable content definitions | `UItemDefinition`, `UAbilityConfig` |
+| Blueprint Content | Subclasses, visual logic, prototyping | `BP_ItemPickup`, `BP_WeaponBase` |
+| UMG Widgets | UI with C++ backing and BP layout | `UInventorySlotWidget`, `UHUDWidget` |
+
+### BP/C++ Split Rationale
+
+| Feature | C++ | Blueprint | Rationale |
+|---------|-----|-----------|-----------|
+| Damage calculation | X | | Performance-critical, server-authoritative |
+| UI layout and animation | | X | Rapid iteration, designer-owned |
+| Interaction detection | X | | Requires overlap/trace in Tick or timer |
+| Interaction response | | X | Content-specific, varies per actor type |
+
+### C++ Header Files
+
+```cpp
+// Provide complete .h files with:
+// - Full UPROPERTY annotations with meta specifiers
+// - UFUNCTION with BlueprintCallable/BlueprintNativeEvent/BlueprintPure
+// - UINTERFACE/IInterface pairs for cross-system communication
+// - DECLARE_DYNAMIC_MULTICAST_DELEGATE for Blueprint-bindable events
+// - Category grouping for organized Blueprint node menus
+```
+
+### Data Table Schemas
+
+| Column | Type | Description | Constraints |
+|--------|------|-------------|-------------|
+| RowName | FName | Unique row identifier | Required, no spaces |
+| DisplayName | FText | Localized display name | Localizable |
+| Value | float | Numeric parameter | ClampMin=0, ClampMax=100 |
+
+### Blueprint Interface Definitions
+
+For each UInterface, document:
+- **Interface name** and module location
+- **Functions** with return types, parameters, and whether they are BlueprintNativeEvent or BlueprintImplementableEvent
+- **Expected implementors** (which actor or component classes should implement this interface)
+- **Call sites** (where in the codebase or Blueprint graph this interface is queried)
+
+### Gameplay Tag Hierarchy
+
+```
+Project.Item.Type.Weapon
+Project.Item.Type.Consumable
+Project.Item.Rarity.Common
+Project.Item.Rarity.Rare
+Project.Ability.Activation.OnUse
+Project.Ability.Cooldown.Short
+```
+
+### Asset Loading Strategy
+
+| Asset Type | Reference Type | Loading Method | Bundle |
+|-----------|---------------|----------------|--------|
+| Item Icons | TSoftObjectPtr | Async on UI open | UI |
+| World Actors | TSoftClassPtr | Async on spawn request | Gameplay |
+| Audio Cues | TSoftObjectPtr | Preload on level start | Audio |
+
+### Testing Strategy
+
+- List automation test names following the `Project.System.Class.TestCase` convention
+- Describe what each test validates (data asset defaults, interface contract compliance, function library outputs)
+- Include expected pass/fail criteria and edge cases
+
+### Integration Notes
+
+- Document module dependencies (which Build.cs modules are required)
+- List any required project settings (Gameplay Tags, Asset Manager configuration, Plugin enablement)
+- Describe the expected workflow for designers consuming this system in Blueprint

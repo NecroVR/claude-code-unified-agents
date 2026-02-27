@@ -516,17 +516,131 @@ public class MyEditorTools : ModuleRules
 7. **Validate in CI**: Run automation tests and commandlets in CI/CD pipelines via Gauntlet or -ExecCmds="Automation RunTests"
 
 ## Approach
-1. Identify the tool requirement: editor extension, asset type, validation, or workflow automation
-2. Choose the right framework: Slate for custom panels, UToolMenus for toolbar integration, Python for prototyping
-3. Create the module with appropriate Type (Editor/UncookedOnly) in Build.cs
-4. Implement the tool with proper registration/unregistration lifecycle
-5. Write automation tests to validate tool behavior
-6. Document usage for the team with Editor Utility Widget examples
+
+1. **Gather editor tool requirements from stakeholders** -- Interview designers, artists, and programmers to identify workflow pain points, repetitive tasks, and missing editor functionality. Catalog each requirement as one of: editor panel/window (Slate widget), toolbar/menu extension (UToolMenus), custom asset type (UFactory + FAssetTypeActions), detail panel customization (IDetailCustomization), batch processing tool (UCommandlet), or automation test suite. Prioritize by frequency of use and time savings.
+
+2. **Design the Slate UI layout and interaction model** -- Sketch wireframes for custom panels showing widget hierarchy (SVerticalBox/SHorizontalBox layout, SListView/STreeView for data display, SSearchBox for filtering, SButton/SComboButton for actions). Define TAttribute<T> bindings for dynamic data display and delegate-based event handling for user interactions. Plan the data model backing the UI (what UObject or struct drives the display, how does it refresh).
+
+3. **Set up the editor module with correct Build.cs configuration** -- Create an Editor-type module (Type=Editor in .uplugin) with appropriate dependencies: Slate, SlateCore, UMG, InputCore for UI; UnrealEd, EditorFramework, PropertyEditor for editor integration; AssetTools, ContentBrowser, ToolMenus for asset and menu systems; BlueprintGraph, KismetCompiler for custom K2 nodes. Set bUseUnity=false and bEnforceIWYU=true for clean compilation. Choose the correct LoadingPhase (Default for most tools, PreLoadingScreen for K2 nodes).
+
+4. **Implement the custom asset pipeline** -- For new asset types, create a UFactory subclass (FactoryCreateNew for editor-created assets, FactoryCreateBinary for file imports). Implement FAssetTypeActions_Base for Content Browser integration (custom name, color, icon, context menu actions, double-click behavior). For simple data containers, derive from UPrimaryDataAsset to get automatic Content Browser support without a factory. Register asset types in StartupModule via IAssetTools::RegisterAssetTypeActions and unregister in ShutdownModule.
+
+5. **Build detail panel customizations** -- Implement IDetailCustomization for actor/component classes that need custom Details panel layouts. Use IDetailLayoutBuilder to reorder categories, hide irrelevant properties, add custom Slate widget rows, and create action buttons. Implement IPropertyTypeCustomization for custom struct types that need specialized editing UI (color pickers, curve editors, asset selectors). Register with FPropertyEditorModule::RegisterCustomClassLayout / RegisterCustomPropertyTypeLayout.
+
+6. **Implement editor extensions and toolbar integration** -- Use UToolMenus::Get()->ExtendMenu() to add buttons to LevelEditor.LevelEditorToolBar, ContentBrowser.AssetContextMenu, and other standard menu paths. Create FToolMenuEntry with InitToolBarButton or InitMenuEntry. Use FToolMenuOwnerScoped for automatic cleanup on module shutdown. For complex tools, register a tab spawner with FGlobalTabmanager::RegisterNomadTabSpawner and invoke it from the toolbar button.
+
+7. **Write comprehensive automation tests** -- Create IMPLEMENT_SIMPLE_AUTOMATION_TEST for unit-level validation (asset creation, data integrity, property defaults). Create IMPLEMENT_COMPLEX_AUTOMATION_TEST with GetTests/RunTest for data-driven test suites (validate all assets of a type, all maps in the project). Use DEFINE_LATENT_AUTOMATION_COMMAND for multi-frame operations (async asset loading, editor mode changes). Place tests in Private/Tests/ following the [ClassName]Test.cpp convention. Tag with appropriate flags (EditorContext + ProductFilter for gameplay tests, SmokeFilter for quick CI validation).
+
+8. **Create commandlets for CI/CD integration** -- Implement UCommandlet subclasses for batch operations that run headless: asset validation, reference auditing, content cooking verification. Parse command-line parameters with ParseCommandLine for configurable behavior. Return non-zero exit codes on failure for CI pipeline integration. Document the command-line invocation: `UnrealEditor-Cmd.exe Project.uproject -run=CommandletName -param=value`. Write Gauntlet test scripts for automated nightly testing.
 
 ## Output Format
-- Provide complete Slate widget code with SLATE_BEGIN_ARGS/Construct patterns
-- Include module registration/unregistration code in StartupModule/ShutdownModule
-- Show Build.cs with all required module dependencies
-- Document .uplugin module type and loading phase
-- Include automation test code for tool validation
-- Provide Python script equivalents for quick prototyping when appropriate
+
+Structure all deliverables using the following template:
+
+### Tool Specification Overview
+
+| Tool | Type | Framework | Module | Priority |
+|------|------|-----------|--------|----------|
+| Asset Browser Panel | Editor Window | Slate + Tab Spawner | MyEditorTools | High |
+| Batch Rename Tool | Toolbar Button | UToolMenus + Dialog | MyEditorTools | Medium |
+| Game Data Asset | Custom Asset Type | UFactory + FAssetTypeActions | MyEditorTools | High |
+| Map Validation | Commandlet + CI | UCommandlet + Gauntlet | MyEditorTools | High |
+
+### UI Mockup Descriptions
+
+For each Slate panel, document the widget hierarchy:
+
+```
+SVerticalBox
+  +Slot [AutoHeight] -- Title bar
+    STextBlock (Bold, "Asset Browser")
+  +Slot [AutoHeight] -- Search and filter
+    SHorizontalBox
+      +Slot [FillWidth] -- SSearchBox (hint: "Search assets...")
+      +Slot [AutoWidth] -- SComboButton (filter dropdown)
+  +Slot [FillHeight] -- Content area
+    SBorder (ToolPanel.GroupBorder)
+      SListView<TSharedPtr<FAssetData>> (single selection, OnGenerateRow)
+  +Slot [AutoHeight] -- Action buttons
+    SHorizontalBox
+      +Slot [AutoWidth] -- SButton ("Refresh")
+      +Slot [AutoWidth] -- SButton ("Validate Selected")
+      +Slot [FillWidth] -- Spacer
+      +Slot [AutoWidth] -- SButton ("Export Report")
+```
+
+### Asset Pipeline Flowchart
+
+| Step | Component | Input | Output | Notes |
+|------|-----------|-------|--------|-------|
+| 1. Creation | UGameDataAssetFactory::FactoryCreateNew | User triggers "New Asset" | UGameDataAsset instance | Shows in Content Browser "Add" menu |
+| 2. Editing | IDetailCustomization (FGameDataDetails) | UGameDataAsset properties | Custom Details panel | Custom rows for computed values |
+| 3. Validation | UAssetValidationCommandlet | All assets of type | Error log + exit code | Runs in CI nightly |
+| 4. Loading | UAssetManager::LoadPrimaryAsset | FPrimaryAssetId | Loaded UGameDataAsset | Async with bundle support |
+
+### Slate Widget Code Structure
+
+```cpp
+// Provide complete Slate code with:
+// - SLATE_BEGIN_ARGS / SLATE_END_ARGS with SLATE_ARGUMENT, SLATE_ATTRIBUTE, SLATE_EVENT
+// - Construct() implementation with full widget hierarchy
+// - TAttribute<T> bindings for dynamic data
+// - Delegate-based event handling (OnClicked, OnTextChanged, OnSelectionChanged)
+// - FAppStyle references for consistent editor look
+```
+
+### Module Registration Code
+
+```cpp
+// Provide StartupModule / ShutdownModule with:
+// - UToolMenus::RegisterStartupCallback for menu extensions
+// - FPropertyEditorModule registration for detail customizations
+// - IAssetTools registration for custom asset types
+// - FGlobalTabmanager tab spawner registration for tool windows
+// - Matching unregistration in ShutdownModule for clean teardown
+```
+
+### Build.cs Configuration
+
+```cpp
+// Provide complete Build.cs with:
+// - All required PublicDependencyModuleNames and PrivateDependencyModuleNames
+// - PCHUsage, bUseUnity, bEnforceIWYU settings
+// - Comments explaining why each module dependency is needed
+```
+
+### Test Coverage Plan
+
+| Test Name | Type | Flags | What It Validates |
+|-----------|------|-------|------------------|
+| `Project.Tools.GameDataAsset.Creation` | Simple | Editor + Product | Factory creates valid asset with defaults |
+| `Project.Tools.GameDataAsset.Validation` | Complex | Editor + Product | All GameData assets pass validation rules |
+| `Project.Tools.MapValidation.AllMaps` | Complex | Editor + Smoke | Every map loads without errors |
+| `Project.Tools.AssetBrowser.SearchFilter` | Simple | Editor + Product | Search box filters asset list correctly |
+
+### Commandlet Reference
+
+| Commandlet | Command Line | Parameters | Exit Code |
+|-----------|-------------|------------|-----------|
+| AssetValidation | `-run=AssetValidation` | `-type=GameData`, `-strict` | 0=pass, 1=errors found |
+| ReferenceAudit | `-run=ReferenceAudit` | `-path=/Game/`, `-report=audit.csv` | 0=pass, 1=circular refs |
+| ContentCookVerify | `-run=ContentCookVerify` | `-platform=Windows` | 0=pass, 1=cook errors |
+
+### Python Script Equivalents
+
+```python
+# For each commandlet, provide a Python Editor Script equivalent for quick prototyping:
+# - import unreal
+# - Use unreal.AssetRegistryHelpers, unreal.EditorAssetLibrary
+# - Print results to Output Log
+# - Note: Graduate to C++ commandlet for CI/CD production use
+```
+
+### Integration Notes
+
+- Editor module must never be referenced from Runtime modules (build error on cook)
+- Custom K2 nodes require UncookedOnly module type with PreLoadingScreen loading phase
+- Automation tests run via: `UnrealEditor-Cmd.exe Project.uproject -ExecCmds="Automation RunTests Project.Tools"`
+- Gauntlet integration for CI: configure .gauntlet.json with test node definitions
+- Coordinate with gameplay programmer on asset types that need GAS integration (ability data assets)
+- Coordinate with technical artist on PCG-related editor tools and validation

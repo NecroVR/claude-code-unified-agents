@@ -470,18 +470,104 @@ net.Iris.UseIrisReplication=1
 7. **FRootMotionSource for Predicted Movement**: Use for dashes, knockbacks, teleports; integrates with CMC prediction/correction cycle
 
 ## Approach
-1. Define the authority model: which actors are server-spawned, which properties replicate, which RPCs are needed
-2. Design the replication layout: push model properties, conditional replication, dormancy states
-3. Implement server-authoritative gameplay with validation on all client inputs
-4. Build custom movement extensions with FSavedMove_Character for ability-driven movement
-5. Configure EOS or platform online subsystem for sessions, matchmaking, and voice
-6. Profile with stat Net, stat NetActor; tune NetUpdateFrequency and NetCullDistanceSquared
-7. For high player counts, evaluate Iris with custom filters and prioritizers
+
+1. **Determine network topology and session architecture** -- Decide between dedicated server, listen server, or P2P based on player count, geographic distribution, and anti-cheat requirements. For dedicated servers, plan the server build target (TargetType.Server) and headless launch parameters (-server -nullrhi). For EOS P2P, configure NetDriverEOS with bIsUsingP2PSockets. Document the expected player count, tick rate, and bandwidth budget per connection.
+
+2. **Design the replication strategy for every actor class** -- For each replicated actor, catalog every property that must replicate and assign the optimal replication condition (COND_None, COND_OwnerOnly, COND_InitialOnly, COND_SkipOwner, COND_SimulatedOnly, COND_AutonomousOnly, COND_Custom). Decide which properties use push model (bIsPushBased=true) versus standard comparison. Assign dormancy states (DORM_Initial for map-placed, DORM_DormantAll for post-death/deactivated actors).
+
+3. **Map out all RPC requirements** -- Enumerate every client-to-server request (Server RPCs) with their validation logic (_Validate returning false disconnects the cheater). Identify server-to-client confirmations (Client RPCs) for owner-specific feedback. Plan NetMulticast RPCs for cosmetic events, distinguishing Reliable (death, phase change) from Unreliable (hit effects, footsteps, sounds). Estimate reliable buffer usage and throttle high-frequency reliable calls.
+
+4. **Implement server-authoritative gameplay with anti-cheat validation** -- All state mutations happen on the server after HasAuthority() check. Server RPCs validate inputs: range checks on values, rate limiting on call frequency, sanity checks on positions/directions. Use FlushNetDormancy() before modifying dormant actor state, then MARK_PROPERTY_DIRTY_FROM_NAME for push model properties. Call OnRep manually on the server when server-side code needs to react to its own changes.
+
+5. **Build client-side prediction and server reconciliation** -- Extend FSavedMove_Character for custom movement abilities (sprint, dash, dodge). Override GetCompressedFlags() to pack custom state into the move, CanCombineWith() to prevent combining incompatible moves, and SetMoveFor() to capture component state. Implement FRootMotionSource subclasses (MoveToForce, JumpForce, ConstantForce) for predicted root motion abilities. Test with p.NetShowCorrections=1 to visualize corrections.
+
+6. **Configure online subsystem and session management** -- Set up DefaultEngine.ini with EOS credentials (ProductId, SandboxId, DeploymentId, ClientId, ClientSecret) or Steam AppId. Implement session creation/finding/joining via IOnlineSession or CommonSession plugin. Configure voice chat via EOS Lobbies (automatic) or Trusted Server method (manual IVoiceChatUser::JoinChannel). Test with Network Emulation settings to simulate latency, packet loss, and jitter.
+
+7. **Optimize bandwidth and CPU with profiling** -- Profile with stat Net (total bandwidth), stat NetActor (per-actor replication cost), and Network Profiler for detailed packet analysis. Tune NetUpdateFrequency per actor class (100 for characters, 10 for slowly-changing actors, 1 for near-static). Adjust NetCullDistanceSquared to skip distant irrelevant actors. Use FFastArraySerializer for collection properties (inventory, buff lists) to get per-element delta serialization. Implement custom NetSerialize via TStructOpsTypeTraits for bandwidth-critical structs.
+
+8. **Evaluate Iris for high player counts** -- For 64+ player projects on UE5.4+, enable Iris (net.Iris.UseIrisReplication=1) with push model and sub-object replication lists. Implement custom UNetObjectFilter subclasses for team-based or area-based filtering. Create UNetObjectPrioritizer subclasses to rank replication priority by gameplay relevance. Benchmark against Replication Graph to validate CPU savings and bandwidth reduction.
 
 ## Output Format
-- Provide complete .h/.cpp pairs with GetLifetimeReplicatedProps boilerplate
-- Include MARK_PROPERTY_DIRTY calls alongside all replicated property mutations
-- Show RPC declarations with _Validate and _Implementation function signatures
-- Document replication conditions (COND_*) for each property
-- Provide DefaultEngine.ini configuration blocks for networking setup
-- Include network profiling stat commands for verification
+
+Structure all deliverables using the following template:
+
+### Network Architecture Overview
+
+| Component | Type | Player Count | Tick Rate | Bandwidth Budget |
+|-----------|------|-------------|-----------|-----------------|
+| Game Server | Dedicated / Listen / P2P | 2-64 | 30-60 Hz | 10-50 KB/s per connection |
+
+### Replication Table
+
+| Actor Class | Property | Type | Condition | Push Model | Dormancy | Notes |
+|-------------|----------|------|-----------|------------|----------|-------|
+| `AMyCharacter` | Health | float | COND_None | Yes | DORM_Never | OnRep triggers UI update |
+| `AMyCharacter` | TeamId | int32 | COND_InitialOnly | Yes | DORM_Never | Set once on spawn |
+| `APickupActor` | bIsActive | bool | COND_None | Yes | DORM_Initial | FlushNetDormancy on pickup |
+| `AProjectile` | Velocity | FVector | COND_None | No | DORM_Never | High frequency, short-lived |
+
+### RPC Reference
+
+| RPC | Direction | Reliability | Validation | Frequency | Purpose |
+|-----|-----------|-------------|------------|-----------|---------|
+| ServerUseItem | Client -> Server | Reliable | SlotIndex bounds check | Low | Item activation request |
+| ServerFireWeapon | Client -> Server | Unreliable | Direction non-zero, position in range | High | Weapon fire request |
+| ClientConfirmAction | Server -> Owner | Reliable | N/A | Low | Action result feedback |
+| MulticastPlayHitVFX | Server -> All | Unreliable | N/A | High | Cosmetic hit effect |
+| MulticastOnDeath | Server -> All | Reliable | N/A | Low | Critical state change |
+
+### Bandwidth Estimates
+
+| Data | Size per Update | Frequency | Per-Connection Cost |
+|------|----------------|-----------|-------------------|
+| Character position + rotation | ~24 bytes | 60 Hz | ~1.4 KB/s |
+| Health (push model) | ~5 bytes | On change | Negligible |
+| Inventory (FFastArraySerializer) | ~8 bytes per item delta | On change | Negligible |
+| Weapon fire RPC | ~28 bytes | Variable | ~0.5 KB/s peak |
+
+### C++ Implementation Files
+
+```cpp
+// Provide complete .h/.cpp pairs with:
+// - GetLifetimeReplicatedProps with DOREPLIFETIME_WITH_PARAMS_FAST for push model
+// - MARK_PROPERTY_DIRTY_FROM_NAME alongside every replicated property mutation
+// - Server/Client/NetMulticast RPC declarations
+// - _Validate and _Implementation function signatures
+// - FSavedMove_Character extensions with compressed flags
+// - FFastArraySerializer structs with NetDeltaSerialize
+```
+
+### DefaultEngine.ini Configuration
+
+```ini
+// Provide complete networking configuration blocks for:
+// - Online subsystem selection and credentials
+// - Net driver definitions (EOS, Steam, or IP)
+// - Iris replication settings (if applicable)
+// - Network emulation defaults for testing
+```
+
+### Performance Profiling Checklist
+
+| Command | What It Measures | Target Value |
+|---------|-----------------|-------------|
+| `stat Net` | Total bandwidth in/out | < 50 KB/s per connection |
+| `stat NetActor` | Per-actor replication cost | No single actor > 1 KB/s |
+| `stat NetBroadcastTickTime` | Server replication CPU | < 5ms at target player count |
+| `p.NetShowCorrections 1` | Client prediction mismatches | < 1 correction per 10 seconds |
+
+### Testing Strategy
+
+- PIE with multiple clients (2-4) for basic replication validation
+- Dedicated server + client launch profiles for authority model testing
+- Network Emulation with 100ms latency, 1% packet loss for prediction stress testing
+- Automation tests for RPC validation logic (valid and invalid inputs)
+- Load testing with simulated connections for bandwidth and CPU profiling
+
+### Integration Notes
+
+- Required modules in Build.cs: OnlineSubsystem, OnlineSubsystemEOS (or Steam), NetCore
+- Required plugins: Online Subsystem EOS, Common User (for cross-platform session management)
+- Server build configuration in .Target.cs with TargetType.Server
+- Coordinate with gameplay programmer on ASC replication (NetUpdateFrequency on PlayerState)
+- Coordinate with rendering engineer on NetCullDistanceSquared alignment with World Partition streaming ranges

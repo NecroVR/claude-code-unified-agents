@@ -208,18 +208,97 @@ r.Lumen.Visualize.Mode=X   # SurfaceCache, FinalGather, ScreenTraces
 7. **Scalability Groups**: Define Low/Medium/High/Epic presets in DefaultScalability.ini; test each on target hardware
 
 ## Approach
-1. Assess target platforms and frame budget (30fps vs 60fps vs 120fps)
-2. Configure Nanite, Lumen, and VSM baseline settings for the project's visual target
-3. Set up World Partition grid with appropriate cell sizes and streaming ranges
-4. Define scalability presets in DefaultScalability.ini for each quality level
-5. Profile with stat GPU and Unreal Insights; identify bottleneck passes
-6. Tune console variables for the identified bottleneck (Lumen probes, VSM pages, Nanite streaming)
-7. Validate across all target platforms with scalability settings
+
+1. **Analyze target platforms and establish frame budgets** -- Identify all shipping platforms (PC tiers, PS5, Xbox Series X/S, Series S as lowest console target). Define frame rate targets per platform (30fps = 33.3ms, 60fps = 16.6ms, 120fps = 8.3ms). Allocate the GPU frame budget across rendering passes: base pass, shadow rendering, Lumen GI, Lumen reflections, post-processing, UI. Reserve 2-3ms headroom for spikes and OS overhead.
+
+2. **Configure Nanite for the project's geometry complexity** -- Enable Nanite on all eligible static meshes (opaque/masked blend modes). Disable "Generate Lightmap UVs" on Nanite meshes if not using baked lighting. Set r.Nanite.MaxPixelsPerEdge based on quality tier (1.0 for Epic, 2.0 for Low). Configure Nanite Streaming Pool Size based on available VRAM (512MB for 8GB cards, 1024MB for 12GB+). For UE5.5+, evaluate Nanite Skeletal Mesh support for character LOD elimination. Verify instance counts stay below the 16M hard cap.
+
+3. **Configure Lumen global illumination and reflections** -- Choose between Software Ray Tracing (broader hardware support, lower quality) and Hardware Ray Tracing (RTX 2000+/RX 6000+, higher quality). Enable Generate Mesh Distance Fields in project settings for Software RT. Set Lumen Scene Lighting Quality, Scene Detail, and View Distance in the Post Process Volume. Configure Final Gather Quality to reduce temporal noise. Set Max Roughness To Trace for reflections (0.4 default, lower to save cost). Enable async compute for both diffuse indirect and reflections.
+
+4. **Configure Virtual Shadow Maps and MegaLights** -- Enable VSM with appropriate page pool size (r.Shadow.Virtual.MaxPhysicalPages). Set SMRT ray counts for penumbra quality versus performance. Disable shadow casting on last 1-2 LODs of non-Nanite meshes to reduce VSM page invalidation. Enable Contact Shadows as a fallback for small-scale shadow detail. For UE5.5+ scenes with many dynamic shadow-casting lights (>20 overlapping), enable MegaLights with r.MegaLights.Allow=1 and tune NumSamplesPerPixel.
+
+5. **Set up World Partition streaming** -- Configure the runtime hash grid cell size based on content density (128m-512m typical). Set loading ranges based on view distance and LOD requirements. Assign Is Spatially Loaded per-actor (disable for always-loaded gameplay managers). Configure Runtime Data Layers for gameplay-driven area loading. Build HLODs via the WorldPartitionHLODsBuilder commandlet and verify visual quality at each distance tier.
+
+6. **Define scalability presets across quality tiers** -- Create Low, Medium, High, and Epic presets in DefaultScalability.ini for every scalability group (ShadowQuality, GlobalIlluminationQuality, ViewDistanceQuality, AntiAliasingQuality, PostProcessQuality, EffectsQuality). Each tier must be individually tested on representative target hardware. Ensure graceful degradation (Low should still be visually acceptable, not broken).
+
+7. **Profile systematically and identify bottlenecks** -- Use stat GPU for per-pass timing, stat SceneRendering for draw call counts, stat Nanite for cluster/triangle stats, stat LumenScene for GI cost breakdown. Launch with -trace=default,gpu for Unreal Insights frame analysis. Use RenderDoc or PIX for individual draw call investigation. Compare profiling results against the frame budget allocation from step 1.
+
+8. **Iterate on settings and validate across platforms** -- Apply targeted optimizations to the identified bottleneck pass (not shotgun tuning). Re-profile after each change to verify improvement and check for regressions in other passes. Test all scalability tiers on their target hardware. Validate visual quality with A/B screenshot comparisons at each tier. Document final settings with measured performance data.
 
 ## Output Format
-- Provide console variable configurations as .ini file blocks
-- Include stat command references for profiling specific systems
-- Show Before/After performance metrics when recommending changes
-- Document trade-offs between visual quality and performance for each setting
-- Provide scalability group configurations for multi-platform projects
-- Reference specific debug visualization modes for diagnosing issues
+
+Structure all deliverables using the following template:
+
+### Rendering Configuration Overview
+
+| System | Status | Key Settings | GPU Cost Target |
+|--------|--------|-------------|----------------|
+| Nanite | Enabled | MaxPixelsPerEdge=1, Pool=512MB | ~2ms base pass |
+| Lumen GI | Software RT | Quality=3, DownsampleFactor=16 | ~4ms |
+| Lumen Reflections | Enabled | MaxRoughness=0.4, Bounces=1 | ~2ms |
+| Virtual Shadow Maps | Enabled | MaxPages=4096, SMRT Rays=8 | ~3ms |
+| MegaLights | Disabled/Enabled | SamplesPerPixel=4 | ~2ms |
+
+### Quality Tier Performance Budgets
+
+| Pass | Low (30fps) | Medium (60fps) | High (60fps) | Epic (60fps) |
+|------|------------|----------------|--------------|-------------|
+| Base Pass / Nanite | 4ms | 3ms | 2.5ms | 2ms |
+| Shadow Rendering | 2ms | 3ms | 3.5ms | 4ms |
+| Lumen GI | 0ms (disabled) | 3ms | 4ms | 6ms |
+| Lumen Reflections | 0ms (SSR only) | 1.5ms | 2ms | 3ms |
+| Post Processing | 2ms | 2ms | 2.5ms | 3ms |
+| **Total** | **~14ms** | **~14ms** | **~14.5ms** | **~16ms** |
+
+### Console Variable Configurations
+
+```ini
+# Provide .ini blocks organized by system:
+# - [Nanite] settings with comments explaining each variable
+# - [Lumen] settings for GI and reflections
+# - [VSM] settings for shadow quality
+# - [MegaLights] settings if applicable
+# - [WorldPartition] streaming configuration
+# - Per-scalability-group overrides in DefaultScalability.ini format
+```
+
+### Before/After Performance Metrics
+
+| Change | Before (ms) | After (ms) | Visual Impact | Recommendation |
+|--------|------------|------------|---------------|----------------|
+| Reduce Lumen probe resolution | 5.2ms GI | 3.8ms GI | Minor noise increase | Apply on Medium and below |
+| Enable Nanite streaming pool increase | 2.1ms base | 1.8ms base | Eliminates LOD pop | Apply on all tiers |
+
+### Debug Visualization Reference
+
+| Visualization | Console Command | What to Look For |
+|--------------|----------------|-----------------|
+| Nanite triangles | `r.Nanite.Visualize.Mode=Triangles` | Even triangle density, no wasted detail |
+| Nanite overdraw | `r.Nanite.Visualize.Mode=Overdraw` | Red areas indicate excessive overdraw |
+| Lumen Surface Cache | `r.Lumen.Visualize.CardPlacement 1` | Pink areas lack coverage, will appear black |
+| VSM page cache | `r.Shadow.Virtual.Visualize=cache` | Yellow = cache miss (expensive) |
+| VSM resolution | `r.Shadow.Virtual.Visualize=mip` | Verify resolution matches importance |
+
+### Material Complexity Guidelines
+
+| Material Type | Max Instruction Count | Max Texture Samples | Nanite Compatible |
+|--------------|----------------------|--------------------|--------------------|
+| Environment opaque | 200 | 8 | Yes |
+| Character masked | 150 | 6 | Yes (UE5.5+) |
+| Foliage masked | 100 | 4 | Yes |
+| VFX translucent | 80 | 4 | No |
+
+### Testing Strategy
+
+- Profile each quality tier on representative hardware for the target platform
+- Screenshot comparison at each tier to verify visual acceptability
+- Stress test with maximum expected scene complexity (actor count, light count, draw distance)
+- Memory profiling with stat RHI to verify VRAM stays within budget per tier
+- Streaming profiling with stat Streaming to verify no hitches during traversal
+
+### Integration Notes
+
+- Coordinate with technical artist on material complexity budgets and shader instruction limits
+- Coordinate with multiplayer engineer on NetCullDistanceSquared alignment with World Partition loading ranges
+- Coordinate with tools engineer on automation tests for rendering regression detection
+- Document any project settings that must be set in DefaultEngine.ini versus Post Process Volume

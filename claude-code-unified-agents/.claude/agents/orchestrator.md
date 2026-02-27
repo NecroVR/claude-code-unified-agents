@@ -51,22 +51,30 @@ You are the master orchestrator responsible for analyzing complex tasks, inspect
 - **frontend-specialist**: React, Vue, Angular, UI implementation
 - **python-pro**: Advanced Python, async, optimization
 - **fullstack-engineer**: End-to-end application development
+- **database-specialist**: SQL/NoSQL schema design, query optimization
 - **mobile-developer**: iOS, Android, React Native, Flutter
-- **blockchain-developer**: Smart contracts, Web3, DeFi
+- **blockchain-developer**: Solidity, Hardhat, DeFi protocols
 - **edge-serverless-developer**: Cloudflare Workers, Lambda, Deno Deploy
+- **legacy-modernizer**: Codebase health analysis, migration planning, strangler fig
+- **cli-developer**: CLI design, argument parsing, plugin systems
+- **i18n-specialist**: Internationalization, ICU MessageFormat, CLDR, RTL
 
 #### Infrastructure Team
 - **devops-engineer**: CI/CD, containerization, deployment
 - **devsecops-engineer**: Security pipeline automation, SAST/SCA, SBOM
 - **iac-specialist**: Terraform, Pulumi, drift detection, policy-as-code
+- **sre-engineer**: SLO/SLI management, error budgets, toil reduction
+- **platform-engineer**: Internal developer platforms, golden paths, self-service
+- **build-engineer**: Build system optimization, bundler config, monorepo tooling
 - **cloud-architect**: AWS, GCP, Azure architecture
 - **kubernetes-expert**: K8s configuration, helm charts, operators
 - **monitoring-specialist**: Observability, metrics, alerting
 
 #### Quality Team
-- **code-reviewer**: Code quality, best practices
-- **security-auditor**: Vulnerability assessment, compliance
-- **test-engineer**: Comprehensive testing strategies
+- **code-reviewer**: AST-based code analysis, complexity scoring
+- **security-auditor**: OWASP scanning, dependency auditing, secrets detection
+- **threat-modeler**: STRIDE threat modeling, attack trees, risk scoring
+- **test-engineer**: Unit/integration testing, TDD/BDD, mutation testing
 - **e2e-test-specialist**: Playwright, Cypress, test strategies
 - **performance-tester**: Load testing, stress testing, benchmarking
 - **accessibility-auditor**: WCAG compliance, screen reader testing
@@ -81,12 +89,14 @@ You are the master orchestrator responsible for analyzing complex tasks, inspect
 - **analytics-engineer**: dbt, data modeling, BI tools
 
 #### Business Team
-- **project-manager**: Sprint planning, coordination
-- **product-strategist**: Market analysis, roadmapping
+- **project-manager**: Agile sprint planning, velocity tracking, risk management
+- **product-strategist**: Market sizing, RICE prioritization, roadmapping, pricing
 - **business-analyst**: Process optimization, gap analysis
 - **technical-writer**: Human-authored documentation, style guides
 - **requirements-analyst**: Requirements engineering, user stories
 - **api-designer**: OpenAPI/GraphQL specs, REST design
+- **research-analyst**: Market research, technology evaluation, TAM/SAM/SOM
+- **competitive-analyst**: Competitive landscape mapping, battle cards, SWOT
 
 #### Creative Team
 - **ux-designer**: User experience, design systems
@@ -331,10 +341,14 @@ class TaskOrchestrator extends EventEmitter {
       'devops-engineer':            ['ci/cd', 'docker', 'kubernetes', 'deploy', 'pipeline'],
       'devsecops-engineer':         ['devsecops', 'sast', 'sca', 'sbom', 'container scan', 'security pipeline'],
       'iac-specialist':             ['terraform', 'pulumi', 'cloudformation', 'infrastructure as code', 'iac', 'drift'],
-      'cloud-architect':            ['aws', 'gcp', 'azure', 'cloud', 'multi-cloud'],
+      'sre-engineer':                ['sre', 'slo', 'sli', 'error budget', 'toil', 'reliability', 'postmortem'],
+      'platform-engineer':           ['platform', 'golden path', 'developer portal', 'self-service', 'backstage'],
+      'build-engineer':              ['build', 'bundle', 'webpack', 'vite', 'esbuild', 'monorepo', 'turborepo', 'nx'],
+      'cloud-architect':             ['aws', 'gcp', 'azure', 'cloud', 'multi-cloud'],
       'security-auditor':           ['security', 'vulnerability', 'audit', 'compliance', 'pentest'],
       'test-engineer':              ['test', 'jest', 'cypress', 'pytest', 'coverage'],
-      'code-reviewer':              ['review', 'refactor', 'quality', 'lint', 'best practice'],
+      'threat-modeler':              ['threat model', 'stride', 'attack tree', 'trust boundary', 'dread'],
+      'code-reviewer':               ['review', 'refactor', 'quality', 'lint', 'best practice'],
       'ai-engineer':                ['ml', 'machine learning', 'llm', 'model', 'training'],
       'agentic-systems-engineer':   ['agent', 'multi-agent', 'orchestrat', 'guardrail', 'tool registry'],
       'data-engineer':              ['etl', 'pipeline', 'warehouse', 'spark', 'airflow'],
