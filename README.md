@@ -1,10 +1,10 @@
 # Claude Code Unified Agents 🤖
 
-A comprehensive collection of specialized Claude Code sub-agents combining the best features from multiple community repositories. This unified collection provides 54 production-ready agents across development, infrastructure, quality, AI/ML, business, creative, meta-management, and specialized domains.
+A comprehensive collection of specialized Claude Code sub-agents combining the best features from multiple community repositories. This unified collection provides 57 production-ready agents across development, infrastructure, quality, AI/ML, business, creative, meta-management, HR & agent management, and specialized domains.
 
 ## 🌟 Features
 
-- **54 Production-Ready Agents**: Comprehensive coverage across all technical, business, and specialized domains
+- **57 Production-Ready Agents**: Comprehensive coverage across all technical, business, specialized, and HR domains
 - **Smart Orchestration**: Master orchestrator for complex multi-agent workflows
 - **Category Organization**: Agents organized by expertise domain for easy discovery
 - **Deep Specialization**: Each agent includes 1000+ lines of production-ready code examples
@@ -72,6 +72,11 @@ A comprehensive collection of specialized Claude Code sub-agents combining the b
 - `ux-designer` - User experience, wireframing, design systems
 - `ui-designer` - Visual design, component libraries
 - `content-strategist` - Content planning, SEO, marketing
+
+### 👔 HR & Agent Management (3 agents)
+- `agent-performance-coach` - Agent quality evaluation, scoring rubrics, definition improvement
+- `agent-gap-analyst` - Capability mapping, coverage gap detection, new agent specification
+- `agent-talent-scout` - External agent discovery, candidate evaluation, format adaptation
 
 ### 🧠 Meta-Management (5 agents)
 - `context-manager` - Session continuity, memory optimization, distributed state
@@ -321,6 +326,13 @@ graph LR
 | error-detective | Root cause analysis, Pattern detection | Debugging, Troubleshooting |
 | documentation-writer | Multi-format generation, API docs | Automated documentation |
 
+### HR & Agent Management
+| Agent | Capabilities | Use Cases |
+|-------|-------------|-----------|
+| agent-performance-coach | Quality scoring, Improvement plans, Staleness detection | Agent audits, Definition improvement |
+| agent-gap-analyst | Capability mapping, Gap detection, Coverage analysis | Finding missing agents, Redundancy checks |
+| agent-talent-scout | External discovery, Candidate evaluation, Format adaptation | Recruiting new agents, Source monitoring |
+
 ## 🤝 Contributing
 
 We welcome contributions! To add new agents:
@@ -361,7 +373,7 @@ claude "Build a REST API with authentication"
 - Enhanced agent capabilities with real-world implementation examples
 
 ### Key Highlights
-- **54 Total Agents** across 8 categories
+- **57 Total Agents** across 9 categories
 - **Production-Ready Code**: Each agent includes comprehensive, tested implementations
 - **Industry Compliance**: HIPAA, PCI DSS, GDPR compliance where applicable
 - **Enterprise Features**: Scalability, security, and best practices built-in

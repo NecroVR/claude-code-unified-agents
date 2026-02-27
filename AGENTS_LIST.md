@@ -67,6 +67,11 @@
 - **error-detective** - Root cause analysis, stack trace forensics, pattern matching
 - **documentation-writer** - Automated docs generation, multiple output formats
 
+## 👔 HR & Agent Management (3 agents)
+- **agent-performance-coach** - Agent quality evaluation, scoring rubrics, definition improvement
+- **agent-gap-analyst** - Capability mapping, coverage gap detection, new agent specification
+- **agent-talent-scout** - External agent discovery, candidate evaluation, format adaptation
+
 ## 🔮 Specialized Domains (5 agents)
 - **game-developer** - Unity, Unreal Engine 5, Godot 4, procedural generation
 - **embedded-engineer** - Arduino, Raspberry Pi, STM32, real-time systems
@@ -168,6 +173,13 @@
 @documentation-writer # Auto documentation
 ```
 
+### For Agent Management
+```
+@agent-performance-coach  # Evaluate and improve agents
+@agent-gap-analyst        # Find capability gaps
+@agent-talent-scout       # Discover external agents
+```
+
 ## Usage Examples
 
 ### Simple Agent Call
@@ -266,9 +278,10 @@ cd claude-code-unified-agents
 | Business & Process | 6 | Management, documentation, analysis |
 | Creative | 3 | Design, UX, content |
 | Meta-Management | 5 | Automation, optimization, tooling |
+| HR & Agent Management | 3 | Agent quality, gaps, recruitment |
 | Specialized Domains | 5 | Industry-specific expertise |
 
-**Total Agents: 54 specialized agents + 1 orchestrator = 55 total**
+**Total Agents: 57 specialized agents + 1 orchestrator = 58 total**
 
 ## Key Features
 
@@ -281,4 +294,4 @@ cd claude-code-unified-agents
 
 ---
 
-*Last Updated: Latest Version (v2.0) - 54 Production-Ready Agents*
+*Last Updated: Latest Version (v2.1) - 57 Production-Ready Agents*
